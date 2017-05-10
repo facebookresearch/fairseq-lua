@@ -122,7 +122,7 @@ $ fairseq preprocess -sourcelang de -targetlang en \
 This will write binarized data that can be used for model training to data-bin/iwslt14.tokenized.de-en.
 
 ### Training
-Use `fairseq train` to tran a new model.
+Use `fairseq train` to train a new model.
 Here a few example settings that work well for the IWSLT14 dataset:
 ```
 # Standard bi-directional LSTM model
