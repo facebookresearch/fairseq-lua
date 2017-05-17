@@ -228,7 +228,7 @@ BLEU4 = 40.55, 67.6/46.5/34.0/25.3 (BP=1.000, ratio=0.998, sys_len=81369, ref_le
 
 # Join the fairseq community
 
-* Facebook page: https://www.facebook.com/groups/1108373622602633/
+* Facebook page: https://www.facebook.com/groups/fairseq.users
 * Google group: https://groups.google.com/forum/#!forum/fairseq-users
 * Contact: [jgehring@fb.com](mailto:jgehring@fb.com), [michaelauli@fb.com](mailto:michaelauli@fb.com)
 
