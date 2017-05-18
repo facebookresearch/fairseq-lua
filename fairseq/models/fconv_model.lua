@@ -718,7 +718,7 @@ FConvModel.generationDecode = argcheck{
     {name='config', type='table'},
     {name='bsz', type='number'},
     call = function(self, config, bsz)
-        local lsoftmax = nn.LogSoftMax():type(self:type())
+        local softmax = nn.SoftMax():type(self:type())
         local m = self:network()
         local convlm = mutils.findAnnotatedNode(m, 'convlm')
         local outmodule = mutils.findAnnotatedNode(m, 'outmodule')
@@ -768,12 +768,12 @@ FConvModel.generationDecode = argcheck{
 
             local cout = convlm:forward({state.inputBuf, state.encoderOut})
             cout = cout:narrow(2, cout:size(2), 1) -- take last step
-            local lsoftmaxIn = (state.lsoftmaxIn or cout.new())
+            local softmaxIn = (state.softmaxIn or cout.new())
                 :resizeAs(cout):copy(cout)         -- contiguous buffer
             if state.targetVocab then
-                lsoftmaxIn = {lsoftmaxIn, state.targetVocab}
+                softmaxIn = {softmaxIn, state.targetVocab}
             end
-            return lsoftmax:forward(outmodule:forward(lsoftmaxIn))
+            return softmax:forward(outmodule:forward(softmaxIn))
         end
     end
 }

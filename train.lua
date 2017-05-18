@@ -272,7 +272,6 @@ if not config.nobleu or config.validbleu then
     genconfig.beam = 1
     genconfig._maxlen = 200
     genconfig.batchsize = config.batchsize
-    genconfig.sizeratio = 1.5
     genconfig.ngpus = 1
     _, gensets = data.loadCorpus{
         config = genconfig,

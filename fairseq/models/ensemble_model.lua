@@ -122,32 +122,33 @@ EnsembleModel.generate = argcheck{
         search.init(bsz, sample)
         local vocabsize =
             sample.targetVocab and sample.targetVocab:size(1) or dict:size()
-        local aggLDists = torch.zeros(bbsz, vocabsize):type(self:type())
+        local aggSoftmax = torch.zeros(bbsz, vocabsize):type(self:type())
         local aggAttnScores = torch.zeros(bbsz, sourceLen):type(self:type())
         -- We do maxlen + 1 steps to give model a chance to predict EOS
         for step = 1, maxlen + 1 do
             timers.decoder:resume()
-            aggLDists:zero()
+            aggSoftmax:zero()
             aggAttnScores:zero()
             for i = 1, #self.models do
-                local ldist = callbacks[i].decode(states[i], targetIns[i])
-                aggLDists:add(ldist)
+                local softmax = callbacks[i].decode(states[i], targetIns[i])
+                aggSoftmax:add(softmax)
                 if callbacks[i].attention then
                     aggAttnScores:add(callbacks[i].attention(states[i]))
                 end
             end
-            -- Average log softmax and attention scores.
-            aggLDists:div(#self.models)
+            -- Average softmax and attention scores.
+            aggSoftmax:div(#self.models)
             aggAttnScores:div(#self.models)
             if cuda.cutorch then
                 cuda.cutorch.synchronize()
             end
             timers.decoder:stop()
 
-            self:updateMinMaxLenProb(aggLDists, dict, step, minlen, maxlen)
+            local aggLogSoftmax = aggSoftmax:log()
+            self:updateMinMaxLenProb(aggLogSoftmax, dict, step, minlen, maxlen)
 
             timers.search_prune:resume()
-            local pruned = search.prune(step, aggLDists, aggAttnScores)
+            local pruned = search.prune(step, aggLogSoftmax, aggAttnScores)
             timers.search_prune:stop()
 
             for i = 1, #self.models do

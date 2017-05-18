@@ -115,7 +115,7 @@ Returns 5 callback functions to be used during the generation step:
   - `encode` will be called before the generation step to run
     the encoder forward pass and duplicate the output for each beam hypotheses
   - `decode` will be called at each step of the generation,
-    it performs the decoder forward pass, and then applies nn.LogSoftMax
+    it performs the decoder forward pass, and then applies nn.SoftMax
   - `attention` will be called at each step of the generation to
     aquire attention scores
   - `update` will be called at each step of the generation to
@@ -167,7 +167,7 @@ beam hypotheses.
 Model.generationDecode = argcheck{
     doc=[[
 Returns a function that performs the decoder forward pass, and then
-applies nn.LogSoftMax on the result.
+applies nn.SoftMax on the result.
 ]],
     {name='self', type='Model'},
     {name='config', type='table'},
@@ -266,7 +266,8 @@ Sentence generation. See search.lua for a description of search functions.
         -- predict EOS
         for step = 1, maxlen + 1 do
             timers.decoder:resume()
-            local ldist = callbacks.decode(state, targetIn)
+            local softmax = callbacks.decode(state, targetIn)
+            local logsoftmax = softmax:log()
             if cuda.cutorch then
                 cuda.cutorch.synchronize()
             end
@@ -276,10 +277,10 @@ Sentence generation. See search.lua for a description of search functions.
                 attnscores:copy(callbacks.attention(state))
             end
 
-            self:updateMinMaxLenProb(ldist, dict, step, minlen, maxlen)
+            self:updateMinMaxLenProb(logsoftmax, dict, step, minlen, maxlen)
 
             timers.search_prune:resume()
-            local pruned = search.prune(step, ldist, attnscores)
+            local pruned = search.prune(step, logsoftmax, attnscores)
             targetIn:copy(pruned.nextIn)
             callbacks.update(state, pruned.nextHid)
             timers.search_prune:stop()

@@ -371,13 +371,13 @@ AvgpoolModel.generationDecode = argcheck{
     {name='config', type='table'},
     {name='bsz', type='number'},
     call = function(self, config, bsz)
-        local lsoftmax = nn.LogSoftMax():type(self:type())
+        local softmax = nn.SoftMax():type(self:type())
         local m = self:network()
         local decoder = mutils.findAnnotatedNode(m, 'decoder')
         return function(state, targetIn)
             local out = decoder:forward(
                 {state.prevhIn, {targetIn}, state.encoderOut})
-            return lsoftmax:forward(out)
+            return softmax:forward(out)
         end
     end
 }
