@@ -233,4 +233,5 @@ for sample in dataset() do
     end
 
     io.stdout:flush()
+    collectgarbage()
 end
