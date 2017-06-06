@@ -396,6 +396,12 @@ if plpath.isfile(lastStatePath) and not config.nosave then
                 state.epoch, state.t, state.epoch_t, state.jumped))
         end
     end
+
+    -- Support modifying the maxepoch setting during resume
+    engine.hooks.onResume = function(state)
+        state.maxepoch = config.maxepoch
+    end
+
     engine:resume{
         path = lastStatePath,
         iterator = corpus.train,
