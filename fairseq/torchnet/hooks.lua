@@ -354,12 +354,9 @@ hooks.onCheckpoint = argcheck{
 
             -- Save model and best model
             if not config.nosave then
-                local model = engine:model()
-                model:network():clearState()
-
                 local modelpath = plpath.join(config.savedir,
                     string.format('model_epoch%d.th7', state.epoch))
-                if utils.retry(3, torch.save, modelpath, model) then
+                if utils.retry(3, engine.saveModel, engine, modelpath) then
                     print(string.format(
                         '%s | saved model to %s', logPrefix, modelpath))
                 end
@@ -368,7 +365,8 @@ hooks.onCheckpoint = argcheck{
                         or valloss < state._onCheckpoint.bestvalloss) then
                     local bestmodelpath = plpath.join(config.savedir,
                         'model_best.th7')
-                    if utils.retry(3, torch.save, bestmodelpath, model) then
+                    if utils.retry(3, engine.saveModel, engine, bestmodelpath)
+                      then
                         print(string.format(
                             '%s | saved new best model to %s', logPrefix,
                             bestmodelpath))

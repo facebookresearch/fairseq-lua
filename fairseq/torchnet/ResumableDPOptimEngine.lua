@@ -245,6 +245,20 @@ ResumableDPOptimEngine.executeAll = argcheck{
     end
 }
 
+ResumableDPOptimEngine.saveModel = argcheck{
+    {name='self', type='tnt.ResumableDPOptimEngine'},
+    {name='modelpath', type='string'},
+    call = function(self, modelpath)
+        self.pool:addjob(1,
+            function()
+                _G.model:network():clearState()
+                torch.save(modelpath, _G.model)
+            end
+        )
+        self.pool:synchronize()
+    end
+}
+
 ResumableDPOptimEngine.training = argcheck{
     {name='self', type='tnt.ResumableDPOptimEngine'},
     call = function(self)
