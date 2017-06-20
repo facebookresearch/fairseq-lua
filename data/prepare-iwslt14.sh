@@ -22,7 +22,7 @@ src=de
 tgt=en
 lang=de-en
 prep=iwslt14.tokenized.de-en
-tmp=prep/tmp
+tmp=$prep/tmp
 orig=orig
 
 mkdir -p $orig $tmp $prep
