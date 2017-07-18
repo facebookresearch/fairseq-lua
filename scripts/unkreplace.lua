@@ -82,7 +82,12 @@ for i = 1, #hypos do
     for j = 1, #htoks do
         if htoks[j] == config.unk then
             local attn = attns[i][j] + config.offset
-            if attn < 1 or attn > #stoks then
+            if attn == #stoks + 1 then
+                io.stderr:write(string.format(
+                    'Sentence %d: <unk> was predicted to EOS. %d\n',
+                    i))
+                break
+            elseif attn < 1 or attn > #stoks then
                 io.stderr:write(string.format(
                     'Sentence %d: attention index out of bound: %d\n',
                     i, attn))
