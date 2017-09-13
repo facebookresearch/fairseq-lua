@@ -4,7 +4,7 @@ It implements the convolutional NMT models proposed in [Convolutional Sequence t
 It features multi-GPU training on a single machine as well as fast beam search generation on both CPU and GPU.
 We provide pre-trained models for English to French, English to German and English to Romanian translation.
 
-![Model](https://scontent-sea1-1.xx.fbcdn.net/v/t39.2365-6/18158912_821511514668337_8758096610476425216_n.gif?_nc_log=1&oh=c153aeed8f74e8c66a81069518e3b059&oe=59ADFE25)
+![Model](fairseq.gif)
 
 # Citation
 
