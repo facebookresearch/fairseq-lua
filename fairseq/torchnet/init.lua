@@ -12,6 +12,7 @@
 --]]
 
 require 'torchnet.sequential.dataset'
+require 'fairseq.torchnet.MaxBatchDataset'
 require 'fairseq.torchnet.ResumableDPOptimEngine'
 require 'fairseq.torchnet.ShardedDatasetIterator'
 require 'fairseq.torchnet.SingleParallelIterator'

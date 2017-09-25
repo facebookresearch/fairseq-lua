@@ -136,6 +136,8 @@ ResumableDPOptimEngine.loadState = argcheck{
                             _G.optstate[k] = v
                         end
                     end
+                    collectgarbage()
+                    collectgarbage()
                 end,
                 function() end,
                 state.params, state.optstate
@@ -252,7 +254,11 @@ ResumableDPOptimEngine.saveModel = argcheck{
         self.pool:addjob(1,
             function()
                 _G.model:network():clearState()
+                collectgarbage()
+                collectgarbage()
                 torch.save(modelpath, _G.model)
+                collectgarbage()
+                collectgarbage()
             end
         )
         self.pool:synchronize()

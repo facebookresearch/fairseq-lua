@@ -105,7 +105,8 @@ function data.sizeFromIndex(field_name)
         if not dataset then
             dataset = ds
             while not torch.isTypeOf(dataset, 'tnt.IndexedDataset') do
-                if torch.isTypeOf(dataset, 'tnt.ResampleDataset') then
+                if torch.isTypeOf(dataset, 'tnt.ResampleDataset') or
+                    torch.isTypeOf(dataset, 'tnt.BucketSortedDataset') then
                     local sampler = dataset.__sampler
                     local source = dataset.__dataset
                     table.insert(resamples, function(idx)
@@ -150,7 +151,9 @@ function data.doubleSizeFromIndex(field_name1, field_name2)
     local getSize1 = data.sizeFromIndex(field_name1)
     local getSize2 = data.sizeFromIndex(field_name2)
     return function(ds, i)
-        return 2^12 * getSize1(ds, i) + getSize2(ds,i)
+        local sz1 = getSize1(ds, i)
+        local sz2 = getSize2(ds, i)
+        return (2^12 * sz1 + sz2), sz1, sz2
     end
 end
 
@@ -271,22 +274,34 @@ local makeTestDataPipeline = argcheck{
 local makeTrainingDataPipeline = argcheck{
     {name='dataset', type='tnt.Dataset'},
     {name='samplesize', type='function'},
+    {name='samplesizeMaxbatch', type='function'},
     {name='merge', type='function'},
     {name='batchsize', type='number'},
-    call = function(dataset, samplesize, merge, batchsize)
-        return tnt.ShuffleDataset{
-            -- Sentence batching
-            dataset = tnt.BatchDataset{
+    {name='maxbatch', type='number'},
+    call = function(dataset, samplesize, samplesizeMaxbatch, merge, batchsize,
+        maxbatch)
+        local batchds
+        -- Bucketing
+        local bucketds = tnt.BucketSortedDataset{
+            samplesize = samplesize,
+            dataset = dataset,
+            shuffle = true,
+        }
+        if maxbatch > 0 then
+            batchds = tnt.MaxBatchDataset{
+                samplesize = samplesizeMaxbatch,
+                maxbatch = maxbatch,
+                merge = merge,
+                dataset = bucketds
+            }
+        else
+            batchds = tnt.BatchDataset{
                 batchsize = batchsize,
                 merge = merge,
-                -- Bucketing
-                dataset = tnt.BucketSortedDataset{
-                    samplesize = samplesize,
-                    dataset = dataset,
-                    shuffle = true,
-                },
-            },
-        }
+                dataset = bucketds
+            }
+        end
+        return tnt.ShuffleDataset{dataset = batchds}
     end
 }
 
@@ -313,6 +328,9 @@ local makeDataIterator = argcheck{
             if test then
                 return makeTestDataPipeline(params)
             else
+                params.maxbatch = config.maxbatch
+                -- second samplesize function for maxbatch only
+                params.samplesizeMaxbatch = samplesize(set)
                 local ds = makeTrainingDataPipeline(params)
                 -- Attach a function to set the random seed. This dataset will
                 -- live in a seprate thread, and this is a convenient way to
@@ -357,6 +375,7 @@ local makeDataIterator = argcheck{
                 }
             end
 
+            -- only used for valid as MaxBatchDataset handles train
             if config.maxbatch > 0 then
                 it = tnt.TruncatedDatasetIterator{
                     iterator = it,
@@ -449,9 +468,6 @@ local makeDataIterator = argcheck{
 --               |
 --               V
 --   [     Mini-batching       ]       according to `merge(set)(fields)`
---               |
---               V
---   [    Batch splitting*      ]       according to `maxbatch`
 --               |
 --               V
 --   [       Sharding*         ]       according to `nshards`
