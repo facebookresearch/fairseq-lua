@@ -4,6 +4,8 @@ It implements the convolutional NMT models proposed in [Convolutional Sequence t
 It features multi-GPU training on a single machine as well as fast beam search generation on both CPU and GPU.
 We provide pre-trained models for English to French, English to German and English to Romanian translation.
 
+Note, there is now a PyTorch version [fairseq-py](https://github.com/facebookresearch/fairseq-py) of this toolkit and new development efforts will focus on it.
+
 ![Model](fairseq.gif)
 
 # Citation
