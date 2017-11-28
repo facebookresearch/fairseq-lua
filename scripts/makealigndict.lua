@@ -7,8 +7,9 @@
 --
 --[[
 --
--- Performs unknown word replacement on output from generation.lua.
--- Prints post-processed hypotheses in sorted order
+-- Generates an alignment dictionary for usage in train.lua and the generation
+-- scripts. Use build_sym_alignment.py to generate a symmetrized alignment file
+-- for a given corpus.
 --
 --]]
 
