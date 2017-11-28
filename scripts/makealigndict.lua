@@ -7,8 +7,8 @@
 --
 --[[
 --
--- Generates an alignment dictionary for usage in train.lua and the generation
--- scripts. Use build_sym_alignment.py to generate a symmetrized alignment file
+-- Generates an alignment dictionary for usage in scripts/unkreplace.lua.
+-- Use build_sym_alignment.py to generate a symmetrized alignment file
 -- for a given corpus.
 --
 --]]
