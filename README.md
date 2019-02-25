@@ -14,7 +14,7 @@ If you use the code in your paper, then please cite it as:
 
 ```
 @article{gehring2017convs2s,
-  author          = {Gehring, Jonas, and Auli, Michael and Grangier, David and Yarats, Denis and Dauphin, Yann N},
+  author          = {Gehring, Jonas and Auli, Michael and Grangier, David and Yarats, Denis and Dauphin, Yann N},
   title           = "{Convolutional Sequence to Sequence Learning}",
   journal         = {ArXiv e-prints},
   archivePrefix   = "arXiv",
@@ -31,7 +31,7 @@ and
 
 ```
 @article{gehring2016convenc,
-  author          = {Gehring, Jonas, and Auli, Michael and Grangier, David and Dauphin, Yann N},
+  author          = {Gehring, Jonas and Auli, Michael and Grangier, David and Dauphin, Yann N},
   title           = "{A Convolutional Encoder Model for Neural Machine Translation}",
   journal         = {ArXiv e-prints},
   archivePrefix   = "arXiv",
