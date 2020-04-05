@@ -1,10 +1,11 @@
 # Introduction
+
+***Note***: there is now a PyTorch version of this toolkit ([fairseq-py](https://github.com/pytorch/fairseq)) and new development efforts will focus on it. The Lua version is preserved here, but is provided without any support.
+
 This is fairseq, a sequence-to-sequence learning toolkit for [Torch](http://torch.ch/) from Facebook AI Research tailored to Neural Machine Translation (NMT).
 It implements the convolutional NMT models proposed in [Convolutional Sequence to Sequence Learning](https://arxiv.org/abs/1705.03122) and [A Convolutional Encoder Model for Neural Machine Translation](https://arxiv.org/abs/1611.02344) as well as a standard LSTM-based model.
 It features multi-GPU training on a single machine as well as fast beam search generation on both CPU and GPU.
 We provide pre-trained models for English to French, English to German and English to Romanian translation.
-
-Note, there is now a PyTorch version [fairseq-py](https://github.com/facebookresearch/fairseq-py) of this toolkit and new development efforts will focus on it.
 
 ![Model](fairseq.gif)
 
@@ -70,41 +71,6 @@ The LuaRocks installation provides a command-line tool that includes the followi
 * `fairseq optimize-fconv`: Optimize a fully convolutional model for generation. This can also be achieved by passing the `-fconvfast` flag to the generation scripts.
 
 # Quick Start
-
-## Evaluating Pre-trained Models
-First, download a pre-trained model along with its vocabularies:
-```
-$ curl https://s3.amazonaws.com/fairseq/models/wmt14.en-fr.fconv-cuda.tar.bz2 | tar xvjf -
-```
-
-This will unpack vocabulary files and a serialized model for English to French translation to `wmt14.en-fr.fconv-cuda/`.
-
-Alternatively, use a CPU-based model:
-```
-$ curl https://s3.amazonaws.com/fairseq/models/wmt14.en-fr.fconv-float.tar.bz2 | tar xvjf -
-```
-
-Let's use `fairseq generate-lines` to translate some text.
-This model uses a [Byte Pair Encoding (BPE) vocabulary](https://arxiv.org/abs/1508.07909), so we'll have to apply the encoding to the source text.
-This can be done with [apply_bpe.py](https://github.com/rsennrich/subword-nmt/blob/master/apply_bpe.py) using the `bpecodes` file in within `wmt14.en-fr.fconv-cuda/`.
-`@@` is used as a continuation marker and the original text can be easily recovered with e.g. `sed s/@@ //g`.
-Prior to BPE, input text needs to be tokenized using `tokenizer.perl` from [mosesdecoder](https://github.com/moses-smt/mosesdecoder).
-Here, we use a beam size of 5:
-```
-$ fairseq generate-lines -path wmt14.en-fr.fconv-cuda/model.th7 -sourcedict wmt14.en-fr.fconv-cuda/dict.en.th7 \
-    -targetdict wmt14.en-fr.fconv-cuda/dict.fr.th7 -beam 5
-| [target] Dictionary: 44666 types
-| [source] Dictionary: 44409 types
-> Why is it rare to discover new marine mam@@ mal species ?
-S	Why is it rare to discover new marine mam@@ mal species ?
-O	Why is it rare to discover new marine mam@@ mal species ?
-H	-0.068684287369251	Pourquoi est-il rare de découvrir de nouvelles espèces de mammifères marins ?
-A	1 1 4 4 6 6 7 11 9 9 9 12 13
-```
-
-This generation script produces four types of output: a line prefixed with *S* shows the supplied source sentence after applying the vocabulary; *O* is a copy of the original source sentence; *H* is the hypothesis along with an average log-likelihood and *A* are attention maxima for each word in the hypothesis (including the end-of-sentence marker which is omitted from the text).
-
-Check [below](#pre-trained-models) for a full list of pre-trained models available.
 
 ## Training a New Model
 
@@ -193,27 +159,8 @@ A	2 2 3 4 5 7 6 7 9 9
 
 # Pre-trained Models
 
-We provide the following pre-trained fully convolutional sequence-to-sequence models:
-
-* [wmt14.en-fr.fconv-cuda.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt14.en-fr.fconv-cuda.tar.bz2): Pre-trained model for [WMT14 English-French](http://statmt.org/wmt14/translation-task.html#Download) including vocabularies
-* [wmt14.en-fr.fconv-float.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt14.en-fr.fconv-float.tar.bz2): CPU version of the above
-* [wmt14.en-de.fconv-cuda.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt14.en-de.fconv-cuda.tar.bz2): Pre-trained model for [WMT14 English-German](https://nlp.stanford.edu/projects/nmt) including vocabularies
-* [wmt14.en-de.fconv-float.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt14.en-de.fconv-float.tar.bz2): CPU version of the above
-* [wmt16.en-ro.fconv-cuda.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt16.en-ro.fconv-cuda.tar.bz2): Pre-trained model for WMT16 English-Romanian including vocabularies.
-  This model was trained on the [original WMT bitext](http://statmt.org/wmt16/translation-task.html#Download) as well as [back-translated data](http://data.statmt.org/rsennrich/wmt16_backtranslations/en-ro) provided by Rico Sennrich.
-* [wmt16.en-ro.fconv-float.tar.bz2](https://s3.amazonaws.com/fairseq/models/wmt16.en-ro.fconv-float.tar.bz2): CPU version of the above
-
-In addition, we provide pre-processed and binarized test sets for the models above:
-
-* [wmt14.en-fr.newstest2014.tar.bz2](https://s3.amazonaws.com/fairseq/data/wmt14.en-fr.newstest2014.tar.bz2): newstest2014 test set for WMT14 English-French
-* [wmt14.en-fr.ntst1213.tar.bz2](https://s3.amazonaws.com/fairseq/data/wmt14.en-fr.ntst1213.tar.bz2): newstest2012 and newstest2013 test sets for WMT14 English-French
-* [wmt14.en-de.newstest2014.tar.bz2](https://s3.amazonaws.com/fairseq/data/wmt14.en-de.newstest2014.tar.bz2): newstest2014 test set for WMT14 English-German
-* [wmt16.en-ro.newstest2014.tar.bz2](https://s3.amazonaws.com/fairseq/data/wmt16.en-ro.newstest2016.tar.bz2): newstest2016 test set for WMT16 English-Romanian
-
 Generation with the binarized test sets can be run in batch mode as follows, e.g. for English-French on a GTX-1080ti:
 ```
-$ curl https://s3.amazonaws.com/fairseq/data/wmt14.en-fr.newstest2014.tar.bz2 | tar xvjf -
-
 $ fairseq generate -sourcelang en -targetlang fr -datadir data-bin/wmt14.en-fr -dataset newstest2014 \
   -path wmt14.en-fr.fconv-cuda/model.th7 -beam 5 -batchsize 128 | tee /tmp/gen.out
 ...
