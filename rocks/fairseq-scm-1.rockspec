@@ -9,7 +9,7 @@ package = 'fairseq'
 version = 'scm-1'
 source = {
   url = 'git://github.com/facebookresearch/fairseq',
-  tag = 'master',
+  tag = 'main',
 }
 description = {
   summary = 'Facebook AI Research Sequence-to-Sequence Toolkit',
